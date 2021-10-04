@@ -2,12 +2,43 @@ import React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import CommentIcon from '@material-ui/icons/Comment';
 import SettingsIcon from '@material-ui/icons/Settings';
-import ForumIcon from '@material-ui/icons/Forum';
 import PersonIcon from '@material-ui/icons/Person';
-import GroupIcon from '@material-ui/icons/Group';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import LocationCityIcon from '@material-ui/icons/LocationCity';
+import CategoryIcon from '@material-ui/icons/Category';
+import SchoolIcon from '@material-ui/icons/School';
+import SubjectIcon from '@material-ui/icons/Subject';
 import { useRouter } from 'next/router';
+
+const modelsList = [
+  {
+    modelName: 'User',
+    icon: AccountCircleIcon,
+  },{
+    modelName: 'City',
+    icon: LocationCityIcon,
+  },{
+    modelName: 'Faq',
+    icon: QuestionAnswerIcon,
+  },{
+    modelName: 'Program',
+    icon: CategoryIcon,
+  },{
+    modelName: 'School',
+    icon: SchoolIcon,
+  },{
+    modelName: 'Student',
+    icon: PersonIcon,
+  },{
+    modelName: 'Subject',
+    icon: SubjectIcon,
+  },{
+    modelName: 'Teacher',
+    icon: PersonIcon,
+  },
+];
 
 export const MainListItems: React.FC = () => {
   const router = useRouter();
@@ -19,30 +50,18 @@ export const MainListItems: React.FC = () => {
         </ListItemIcon>
         <ListItemText primary="Settings" />
       </ListItem>
-      <ListItem button onClick={() => router.push('/admin/models/User')}>
-        <ListItemIcon>
-          <PersonIcon />
-        </ListItemIcon>
-        <ListItemText primary="Users" />
-      </ListItem>
-      <ListItem button onClick={() => router.push('/admin/models/Post')}>
-        <ListItemIcon>
-          <ForumIcon />
-        </ListItemIcon>
-        <ListItemText primary="Posts" />
-      </ListItem>
-      <ListItem button onClick={() => router.push('/admin/models/Comment')}>
-        <ListItemIcon>
-          <CommentIcon />
-        </ListItemIcon>
-        <ListItemText primary="Comments" />
-      </ListItem>
-      <ListItem button onClick={() => router.push('/admin/models/Group')}>
-        <ListItemIcon>
-          <GroupIcon />
-        </ListItemIcon>
-        <ListItemText primary="Groups" />
-      </ListItem>
+      {modelsList.map((item)=>(
+        <ListItem
+          key={item.modelName}
+          button
+          onClick={() => router.push(`/admin/models/${item.modelName}`)}
+        >
+          <ListItemIcon>
+            <item.icon />
+          </ListItemIcon>
+          <ListItemText primary={item.modelName} />
+        </ListItem>
+      ))}
     </div>
   );
 };

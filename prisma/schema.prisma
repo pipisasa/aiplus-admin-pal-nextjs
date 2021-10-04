@@ -1,51 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
-// models examples
 model User {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  email     String    @unique
-  name      String?
-  password  String
-  posts     Post[]
-  group     Group?    @relation(fields: [groupId], onDelete: SetNull, references: [id])
-  groupId   Int?
-  comments  Comment[]
+  id                  Int      @id @default(autoincrement())
+  isAdmin             Boolean  @default(false)
+  fio                 String
+  email               String   @unique
+  password            String
+  isBlocked           Boolean  @default(false)
+  dateLastLogin       DateTime @default(now())
+  passwordChangedTime DateTime @default(now())
+  rememberToken       String?  @db.VarChar(255)
+  image               String?  @db.VarChar(255)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
-model Post {
-  id        Int       @id @default(autoincrement())
-  published Boolean   @default(false)
-  title     String
-  author    User?     @relation(fields: [authorId], onDelete: Cascade, references: [id])
-  authorId  Int?
-  comments  Comment[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Comment {
+model City {
   id        Int      @id @default(autoincrement())
-  contain   String
-  post      Post     @relation(fields: [postId], onDelete: Cascade, references: [id])
-  postId    Int
-  author    User?    @relation(fields: [authorId], onDelete: SetNull, references: [id])
-  authorId  Int?
+  name      String   @db.VarChar(255)
+  schools   School[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Group {
+model Faq {
+  id            Int      @id @default(autoincrement())
+  titleRu       String   @db.VarChar(255)
+  titleKz       String   @db.VarChar(255)
+  descriptionRu String
+  descriptionKz String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model School {
+  id            Int       @id @default(autoincrement())
+  city          City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  cityId        Int
+  titleEn       String    @db.VarChar(255)
+  titleRu       String    @db.VarChar(255)
+  titleKz       String    @db.VarChar(255)
+  descriptionEn String
+  descriptionRu String
+  descriptionKz String
+  programs      Program[]
+  students      Student[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Program {
+  id            Int      @id @default(autoincrement())
+  school        School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId      Int
+  titleEn       String   @db.VarChar(255)
+  titleRu       String   @db.VarChar(255)
+  titleKz       String   @db.VarChar(255)
+  descriptionEn String
+  descriptionRu String
+  descriptionKz String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Student {
+  id           Int      @id @default(autoincrement())
+  school       School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId     Int
+  firstName    String   @db.VarChar(255)
+  lastName     String   @db.VarChar(255)
+  dateOfFinish DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  images       Image[]  @relation("studentImages")
+}
+
+model Subject {
+  id            Int       @id @default(autoincrement())
+  titleEn       String    @db.VarChar(255)
+  titleRu       String    @db.VarChar(255)
+  titleKz       String    @db.VarChar(255)
+  descriptionEn String?
+  descriptionRu String?
+  descriptionKz String?
+  schools       Teacher[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Teacher {
   id        Int      @id @default(autoincrement())
-  name      String
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subjectId Int?
+  firstName String   @db.VarChar(255)
+  lastName  String   @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users     User[]
+  images    Image[] @relation("teacherImages")
+}
+
+model Feature {
+  id        Int     @id @default(autoincrement())
+  titleKz   String  @db.VarChar(255)
+  titleRu   String  @db.VarChar(255)
+  titleEn   String  @db.VarChar(255)
+  contentKz String
+  contentRu String
+  contentEn String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  images    Image[] @relation("featureImages")
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  name        String
+  size        Int
+  contentType String
+  url         String   @unique
+  filename    String   @db.VarChar(255)
+  storage     String   @default("gs://chat-angular-e97bc.appspot.com") @db.VarChar(255)
+  student     Student? @relation("studentImages", fields: [studentId], references: [id])
+  studentId   Int?
+  feature     Feature? @relation("featureImages", fields: [featureId], references: [id])
+  featureId   Int?
+  teacher     Teacher? @relation("teacherImages", fields: [teacherId], references: [id])
+  teacherId   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

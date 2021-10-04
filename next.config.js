@@ -9,4 +9,13 @@ module.exports = {
   serverRuntimeConfig: {
     JWT_SECRET: 'changeMe',
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/admin',
+        permanent: true,
+      },
+    ]
+  },
 };
